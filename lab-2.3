@@ -1,0 +1,76 @@
+using System;
+
+namespace _3
+{
+    class Program
+    {
+        class DocumentWorker
+        {
+            public DocumentWorker() { }
+            public virtual void OpenDocument()
+            {
+                Console.WriteLine("Document opened!");
+            }
+            public virtual void EditDocument()
+            {
+                Console.WriteLine("Editing alowed only in \"Pro\" version!");
+            }
+            public virtual void SaveDocument()
+            {
+                Console.WriteLine("Saving alowed only in \"Pro\" version!");
+            }
+        }
+
+        class ProDocumentWorker:DocumentWorker
+        {
+            public override void EditDocument()
+            {
+                Console.WriteLine("Document edited!");
+            }
+            public override void SaveDocument()
+            {
+                Console.WriteLine("Document saved by old version, saving in other formats alowed only in version \"Expert\"!");
+            }
+        }
+
+        class ExpertDocumentWorker : ProDocumentWorker
+        {
+            public override void SaveDocument()
+            {
+                Console.WriteLine("Document saved in new format!");
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            string pro_access_key = "kpkOJJ!029";
+            string expert_access_key = "bhbHH2009";
+            bool alpha;
+            Console.WriteLine("Do you already have access key? (1 - yes | 0 - not yet)");
+            alpha = Convert.ToBoolean(Console.ReadLine());
+            while (alpha)
+            {
+                Console.WriteLine("Enter access key: ");
+                if(Console.ReadLine() == pro_access_key)
+                {
+                    ProDocumentWorker dw = new ProDocumentWorker();
+                    break;
+                }
+                else if (Console.ReadLine() == expert_access_key)
+                {
+                    ProDocumentWorker dw = new ProDocumentWorker();
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Wrong key!\n");
+                }
+            }
+            if (!alpha)
+            {
+                DocumentWorker dw = new DocumentWorker();
+            }
+                
+        }
+    }
+}
