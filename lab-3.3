@@ -1,0 +1,91 @@
+using System;
+
+namespace _3
+{
+    class Program
+    {
+
+        class Currency
+        {
+            public double Value;
+        }
+
+
+        class CurrencyUSD : Currency
+        {
+            static public float ToRub;
+            static public float ToEur;
+            public CurrencyUSD(double val)
+            {
+                Value = val;
+            }
+            public static explicit operator CurrencyUSD(CurrencyEUR eur)
+            {
+                return new CurrencyUSD(eur.Value* ToEur);
+            }
+            public static explicit operator CurrencyUSD(CurrencyRUB rub)
+            {
+                return new CurrencyUSD(rub.Value * ToRub);
+            }
+            public override string ToString()
+            {
+                return Value.ToString();
+            }
+        }
+
+        class CurrencyEUR : Currency
+        {
+            static public float ToRub;
+            static public float ToUsd;
+            public CurrencyEUR(double val)
+            {
+                Value = val;
+            }
+            public static explicit operator CurrencyEUR(CurrencyUSD usd)
+            {
+                return new CurrencyEUR(usd.Value * ToUsd);
+            }
+            public static explicit operator CurrencyEUR(CurrencyRUB rub)
+            {
+                return new CurrencyEUR(rub.Value * ToRub);
+            }
+            public override string ToString()
+            {
+                return Value.ToString();
+            }
+        }
+
+        class CurrencyRUB : Currency
+        {
+            static public float ToUsd;
+            static public float ToEur;
+            public CurrencyRUB(double val)
+            {
+                Value = val;
+            }
+            public static explicit operator CurrencyRUB(CurrencyUSD usd)
+            {
+                return new CurrencyRUB(usd.Value * ToUsd);
+            }
+            public static explicit operator CurrencyRUB(CurrencyEUR eur)
+            {
+                return new CurrencyRUB(eur.Value * ToEur);
+            }
+            public override string ToString()
+            {
+                return Value.ToString();
+            }
+        }
+        static void Main(string[] args)
+        {
+            double cash = 10000;
+            CurrencyRUB cash_rub = new CurrencyRUB(cash);
+            CurrencyUSD cash_usd = (CurrencyUSD)cash_rub;
+            CurrencyEUR cash_eur = (CurrencyEUR)cash_rub;
+
+            Console.WriteLine("Rubles: " + cash_rub.ToString());
+            Console.WriteLine("Dollars: " + cash_usd.ToString());
+            Console.WriteLine("Euros: " + cash_eur.ToString());
+        }
+    }
+}
