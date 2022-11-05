@@ -1,0 +1,42 @@
+using System;
+using System.Collections.Generic;
+
+namespace _2
+{
+    class Program
+    {
+        class Car:IEquatable<Car>
+        {
+            public string Name;
+            public string Engine;
+            uint MaxSpeed;
+
+            public override string ToString()
+            {
+                return Name;
+            }
+
+            public bool Equals(Car car)
+            {
+                if (car is null) { return false; }
+                if (Name != car.Name) { return false; }
+                if (Engine != car.Engine) { return false; }
+                if (MaxSpeed != car.MaxSpeed) { return false; }
+                return true;
+            }
+
+        }
+
+        class CarsCatalog
+        {
+            List<Car> car_list { get { return car_list; } }
+            public string this[int index]{
+                get { return car_list[index].Name + car_list[index].Engine; }
+            }
+        }
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Hello World!");
+        }
+    }
+}
