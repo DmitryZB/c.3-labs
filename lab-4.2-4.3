@@ -1,0 +1,145 @@
+using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+
+namespace _2
+{
+    class Program
+    {
+        class Car
+        {
+            public string Name { get; set; }
+            public uint ProductionYear { get; set; }
+            public uint MaxSpeed { get; set; }
+
+            public Car(string name_, uint prod_year, uint max_speed)
+            {
+                Name = name_;
+                ProductionYear = prod_year;
+                MaxSpeed = max_speed;
+            }
+
+        }
+
+        class CarCatalog
+        {
+            Car[] catalog;
+            uint Len;
+            public CarCatalog(Car[] cars)
+            {
+                Len = Convert.ToUInt32(cars.GetUpperBound(0) + 1);
+                catalog = new Car[Len];
+                for (uint i = 0; i < Len; ++i)
+                {
+                    catalog[i] = new Car(cars[i].Name, cars[i].ProductionYear, cars[i].MaxSpeed);
+                    //catalog[i].ProductionYear = cars[i].ProductionYear;
+                    //catalog[i].Name = cars[i].Name;
+                    //catalog[i].MaxSpeed = cars[i].MaxSpeed;
+                }
+            }
+            public IEnumerable<Car> GetEnumenator()
+            {
+                for(uint i = 0; i < Len; ++i)
+                {
+                    yield return catalog[i];
+                }
+            }
+
+            public IEnumerable<Car> GetReversiveEnumerator()
+            {
+                for (uint i = Len; i > 0; --i)
+                {
+                    yield return catalog[i-1];
+                }
+            }
+
+            public IEnumerable<Car> GetSpeedFilterEnumerator(uint speed)
+            {
+                for (uint i = 0; i < Len; ++i)
+                {
+                    if (catalog[i].MaxSpeed >= speed) { yield return catalog[i]; }
+                }
+            }
+            public IEnumerable<Car> GetYearFilterEnumerator(uint year)
+            {
+                for (uint i = 0; i < Len; ++i)
+                {
+                    if (catalog[i].ProductionYear >= year) { yield return catalog[i]; }
+                }
+            }
+
+        }
+
+        public enum Comparator
+        {
+            ByName, ByYear, BySpeed
+        }
+
+        class CarComparer : IComparer<Car>
+        {
+            private Comparator comparer;
+            public CarComparer(Comparator comparator_)
+            {
+                comparer = comparator_;
+            }
+            public int Compare([AllowNull] Car x, [AllowNull] Car y)
+            {
+                if (x == null && y == null) return 0;
+                if (x == null) return 1;
+                if (y == null) return -1;
+
+                return comparer switch
+                {
+                    Comparator.ByName => x.Name.CompareTo(y.Name),
+                    Comparator.BySpeed => x.MaxSpeed.CompareTo(y.MaxSpeed),
+                    Comparator.ByYear => x.ProductionYear.CompareTo(y.ProductionYear),
+                    _ => throw new ArgumentException("wrong command!")
+                };
+            }
+        }
+        static void Main(string[] args)
+        {
+            Car car1 = new Car("Auto1", 2022, 240);
+            Car car2 = new Car("Auto2", 2004, 280);
+            Car car3 = new Car("Auto3", 1988, 90);
+            Car[] cars = new Car[] { car1, car2, car3};
+            Console.WriteLine("\nARRAY:\n");
+            for (uint i = 0; i < 3; ++i) { Console.WriteLine($"{cars[i].Name} \n {cars[i].ProductionYear} \n {cars[i].MaxSpeed} \n"); }
+            Array.Sort(cars, new CarComparer(Comparator.ByYear));
+            Console.WriteLine("\nYear Sorted:\n");
+            for (uint i = 0; i < 3; ++i) { Console.WriteLine($"{cars[i].Name} \n {cars[i].ProductionYear} \n {cars[i].MaxSpeed} \n"); }
+            Array.Sort(cars, new CarComparer(Comparator.BySpeed));
+            Console.WriteLine("\nSpeed Sorted:\n");
+            for (uint i = 0; i < 3; ++i) { Console.WriteLine($"{cars[i].Name} \n {cars[i].ProductionYear} \n {cars[i].MaxSpeed} \n"); }
+            Array.Sort(cars, new CarComparer(Comparator.ByName));
+            Console.WriteLine("\nName Sorted:\n");
+            for (uint i = 0; i < 3; ++i) { Console.WriteLine($"{cars[i].Name} \n {cars[i].ProductionYear} \n {cars[i].MaxSpeed} \n"); }
+
+
+            Console.WriteLine("\n\nTASK #3");
+            Console.WriteLine("\nDefault:\n");
+            CarCatalog cars_ = new CarCatalog(cars);
+            foreach(Car car in cars_.GetEnumenator())
+            {
+                Console.WriteLine($"Name: {car.Name} PrYear: {car.ProductionYear} Max Speed: {car.MaxSpeed}\n");
+            }
+            Console.WriteLine("\nReverse:\n");
+            foreach (Car car in cars_.GetReversiveEnumerator())
+            {
+                Console.WriteLine($"Name: {car.Name} PrYear: {car.ProductionYear} Max Speed: {car.MaxSpeed}\n");
+            }
+            Console.WriteLine("\nYear >= 2000:\n");
+            foreach (Car car in cars_.GetYearFilterEnumerator(2000))
+            {
+                Console.WriteLine($"Name: {car.Name} PrYear: {car.ProductionYear} Max Speed: {car.MaxSpeed}\n");
+            }
+
+            Console.WriteLine("\nMax Speed >= 250:\n");
+            foreach (Car car in cars_.GetSpeedFilterEnumerator(250))
+            {
+                Console.WriteLine($"Name: {car.Name} PrYear: {car.ProductionYear} Max Speed: {car.MaxSpeed}\n");
+            }
+
+        }
+    }
+}
