@@ -1,0 +1,123 @@
+using System;
+
+namespace _1
+{
+    class Program
+    {
+
+        class MyMatrix
+        {
+            public float[,] matrix;
+            public static int rand1;
+            public static int rand2;
+
+            public MyMatrix(uint rows, uint columns)
+            {
+                matrix = new float[rows, columns];
+                Random rand = new Random();
+                for (uint i = 0; i < columns; ++i)
+                {
+                    for (uint j = 0; j < rows; ++j)
+                    {
+                        matrix[j, i] = rand.Next() % (rand2 - rand1 + 1) + rand1;
+                    }
+                }
+            }
+
+            public void Fill()
+            {
+                int rows = matrix.GetUpperBound(0) + 1;
+                int columns = matrix.GetUpperBound(1) + 1;
+                Random rand = new Random();
+                for (uint i = 0; i < columns; ++i)
+                {
+                    for (uint j = 0; j < rows; ++j)
+                    {
+                        matrix[j, i] = rand.Next() % (rand2 - rand1 + 1) + rand1;
+                    }
+                }
+            }
+
+            public MyMatrix(float[,] matrix1)
+            {
+                int rows = matrix1.GetUpperBound(0) + 1;
+                int columns = matrix1.GetUpperBound(1) + 1;
+                if (rows < 0 && columns < 0) { return; }
+                matrix = new float[rows, columns];
+                for (uint i = 0; i < rows; ++i)
+                {
+                    for (uint j = 0; j < columns; ++j)
+                    {
+                        matrix[i, j] = matrix1[i, j];
+                    }
+                }
+            }
+
+            public void ChangeSize(uint new_m, uint new_n)
+            {
+                MyMatrix matrix1 = new MyMatrix(new_m, new_n);
+                int rows = Convert.ToInt32(Math.Min(matrix.GetUpperBound(0) + 1, new_m));
+                int columns = Convert.ToInt32(Math.Min(matrix.GetUpperBound(1) + 1, new_n));
+                for (uint i = 0; i < columns; ++i)
+                {
+                    for (uint j = 0; j < rows; ++j)
+                    {
+                        matrix1.matrix[j, i] = matrix[j, i];
+                    }
+                }
+
+                matrix = matrix1.matrix;
+
+            }
+
+            public void ShowPartialy(int start_m, int last_m, int start_n, int last_n)
+            {
+                for (int i = start_m; i < last_m+1; ++i)
+                {
+                    for (int j = start_n; j < last_n+1; ++j)
+                    {
+                        Console.Write($"{ matrix[j, i]}\t");
+                    }
+                    Console.WriteLine();
+                }
+            }
+
+            public void Show()
+            {
+                int rows = matrix.GetUpperBound(0) + 1;
+                int columns = matrix.GetUpperBound(1) + 1;
+                for (uint i = 0; i < columns; ++i)
+                {
+                    for (uint j = 0; j < rows; ++j)
+                    {
+                        Console.Write($"{matrix[j, i]}\t");
+                    }
+                    Console.WriteLine();
+                }
+            }
+            public float this[uint index1, uint index2]
+            {
+                get { return this.matrix[index1, index2]; }
+                set { matrix[index1, index2] = value; }
+            }
+        }
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Program works!");
+            MyMatrix.rand1 = Convert.ToInt32(Console.ReadLine());
+            MyMatrix.rand2 = Convert.ToInt32(Console.ReadLine());
+            MyMatrix m1 = new MyMatrix(8, 4);
+            MyMatrix m2 = new MyMatrix(4, 8);
+            m1.Show();
+            Console.WriteLine();
+            m1.ShowPartialy(1, 3, 1, 3);
+            Console.WriteLine();
+            m1.ChangeSize(8, 8);
+            m1.Show();
+            Console.WriteLine();
+            m1.Fill();
+            m1.Show();
+        }
+    }
+}
