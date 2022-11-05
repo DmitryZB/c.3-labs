@@ -1,0 +1,157 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace lab6
+{
+    struct Weather : IComparable<Weather>
+    {
+        public string country;
+        public string description;
+        public float temp;
+        public string name;
+
+        public Weather(string data)
+        {
+            var buf = new StringBuilder();
+
+            int i = data.IndexOf("country");
+            if (i >= 0)
+            {
+                i += 10;
+                while (data[i] != '\"')
+                {
+                    buf.Append(data[i]);
+                    ++i;
+                }
+                country = buf.ToString();
+            }
+            else
+                country = null;
+
+            buf.Clear();
+            i = data.IndexOf("name");
+            if (i >= 0)
+            {
+                i += 7;
+                while (data[i] != '\"')
+                {
+                    buf.Append(data[i]);
+                    ++i;
+                }
+                name = buf.ToString();
+            }
+            else
+                name = null;
+
+            buf.Clear();
+            i = data.IndexOf("description");
+            i += 14;
+            while (data[i] != '\"')
+            {
+                buf.Append(data[i]);
+                ++i;
+            }
+            description = buf.ToString();
+
+            buf.Clear();
+            i = data.IndexOf("temp");
+            i += 6; //начало числа
+            while (data[i] != '.' && data[i] != ',' && data[i] != '\"')
+            {
+                buf.Append(data[i]);
+                ++i;
+            }
+            temp = float.Parse(buf.ToString()) - 271;
+        }
+
+        public int CompareTo(Weather other)
+        {
+            return temp.CompareTo(other.temp);
+        }
+        public void Print()
+        {
+            Console.WriteLine($"{country}:\n" +
+                $"{name}: Temperature = {temp} °C, {description}");
+        }
+    }
+
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            using HttpClient client = new HttpClient();
+            List<Weather> list = new List<Weather>();
+            Random rand = new Random();
+            int i = 0;
+
+            while (i < 50)
+            {
+                double lat_ = rand.Next(-90, 90) + rand.NextDouble();
+                double lon_ = rand.Next(-180, 180) + rand.NextDouble();
+                var content = await client.GetStringAsync(
+                    $"http://api.openweathermap.org/data/2.5/weather?" +
+                    $"lat={lat_}&lon={lon_}" +
+                    $"&APPID=d4020b638cd47e7207bef9d86d8cb5f9");
+                Weather weather = new Weather(content);
+                if (weather.country != null && weather.name != null)
+                {
+                    list.Add(weather);
+                    ++i;
+                    list[^1].Print();
+                }
+            }
+
+            Weather min = list.Min();
+            Weather max = list.Max();
+
+            double average = list.Average(weather => weather.temp);
+
+            int count = list.Count();
+
+            Console.WriteLine();
+            Console.WriteLine($"Minimal Temperature ({min.temp} C) in {min.country}; \n" +
+                $"Maximal Temperature ({max.temp} C) in {max.country};\n" +
+                $"Average = {average};\n" +
+                $"Count - {count}");
+
+
+            Weather weather_clear_sky = list.FirstOrDefault(weather => weather.description == "clear sky");
+            Weather weather_rain = list.FirstOrDefault(weather => weather.description == "rain");
+            Weather weather_few_clouds = list.FirstOrDefault(weather => weather.description == "few clouds");
+
+            if(weather_clear_sky.country == null)
+            {
+                Console.WriteLine("No clear sky in this countryes :(");
+            }
+            else
+            {
+                Console.WriteLine($"Clear sky weather in {weather_clear_sky.country}, " +
+                    $"{weather_clear_sky.name}");
+            }
+
+            if (weather_rain.country == null)
+            {
+                Console.WriteLine("No rain weather in this countryes :(");
+            }
+            else
+            {
+                Console.WriteLine($"Rain in {weather_rain.country}, " +
+                    $"{weather_rain.name}");
+            }
+
+            if (weather_few_clouds.country == null)
+            {
+                Console.WriteLine("No cloudy weather in this countryes :(");
+            }
+            else
+            {
+                Console.WriteLine($"Few clouds in {weather_few_clouds.country}, " +
+                    $"{weather_few_clouds.name}");
+            }
+        }
+    }
+}
