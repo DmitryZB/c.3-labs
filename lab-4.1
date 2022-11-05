@@ -1,0 +1,148 @@
+using System;
+
+namespace lab4
+{
+
+    class MyMatrix
+    {
+        public float[,] matrix;
+        public static int rand1;
+        public static int rand2;
+
+        public MyMatrix(uint rows, uint columns)
+        {
+            matrix = new float[rows, columns];
+            Random rand = new Random();
+            for(uint i = 0; i < columns; ++i)
+            {
+                for (uint j = 0; j < rows; ++j)
+                {
+                    matrix[j, i] = rand.Next()%(rand2 - rand1 + 1) + rand1;
+                }
+            }
+        }
+
+        public MyMatrix(float[,] matrix1)
+        {
+            int rows = matrix1.GetUpperBound(0) + 1;
+            int columns = matrix1.GetUpperBound(1) + 1;
+            if(rows < 0 && columns < 0) { return; }
+            matrix = new float[rows, columns];
+            for (uint i = 0; i < rows; ++i)
+            {
+                for (uint j = 0; j < columns; ++j)
+                {
+                    matrix[i, j] = matrix1[i, j];
+                }
+            }
+        }
+
+        static public MyMatrix operator + (MyMatrix matrix1, MyMatrix matrix2)
+        {
+            int rows = matrix1.matrix.GetUpperBound(0) + 1;
+            int columns = matrix1.matrix.GetUpperBound(1) + 1;
+            if (rows-1 != matrix2.matrix.GetUpperBound(0) || columns-1 != matrix2.matrix.GetUpperBound(1))
+            {
+                return null;
+            }
+            float[,] arr = new float[rows, columns];
+            for (uint i = 0; i < rows; ++i)
+            {
+                for (uint j = 0; j < columns; ++j)
+                {
+                    arr[i, j] = matrix1.matrix[i, j] + matrix2.matrix[i, j];
+                }
+            }
+            MyMatrix matrix = new MyMatrix(arr);
+            return matrix;
+        }
+
+        static public MyMatrix operator -(MyMatrix matrix1, MyMatrix matrix2)
+        {
+            int rows = matrix1.matrix.GetUpperBound(0) + 1;
+            int columns = matrix1.matrix.GetUpperBound(1) + 1;
+            if (rows-1 != matrix2.matrix.GetUpperBound(0) || columns-1 != matrix2.matrix.GetUpperBound(1))
+            {
+                return null;
+            }
+            float[,] arr = new float[rows, columns];
+            for (uint i = 0; i < rows; ++i)
+            {
+                for (uint j = 0; j < columns; ++j)
+                {
+                    arr[i, j] = matrix1.matrix[i, j] - matrix2.matrix[i, j];
+                }
+            }
+            MyMatrix matrix = new MyMatrix(arr);
+            return matrix;
+        }
+
+        static public MyMatrix operator *(MyMatrix matrix1, MyMatrix matrix2)
+        {
+            int rows = matrix1.matrix.GetUpperBound(0) + 1;
+            int columns = matrix2.matrix.GetUpperBound(1) + 1;
+            if (matrix1.matrix.GetUpperBound(1) != matrix2.matrix.GetUpperBound(0))
+            {
+                return null;
+            }
+            float[,] arr = new float[rows, columns];
+
+            for (uint i = 0; i < rows; ++i)
+            {
+                for (uint j = 0; j < columns; ++j)
+                {
+                    for (uint n = 0; n < matrix2.matrix.GetUpperBound(0) + 1; ++n)
+                    {
+                        arr[i, j] += matrix1.matrix[i, n] * matrix2.matrix[n, j];
+                    }
+                }
+            }
+            MyMatrix matrix = new MyMatrix(arr);
+            return matrix;
+        }
+
+        static public MyMatrix operator *(MyMatrix matrix1, float multy)
+        {
+            int rows = matrix1.matrix.GetUpperBound(0) + 1;
+            int columns = matrix1.matrix.GetUpperBound(1) + 1;
+            float[,] arr = new float[rows, columns];
+            for (uint i = 0; i < rows; ++i)
+            {
+                for (uint j = 0; j < columns; ++j)
+                {
+                    arr[i, j] = matrix1.matrix[i, j]*multy;
+                }
+            }
+            MyMatrix matrix = new MyMatrix(arr);
+            return matrix;
+        }
+        static public MyMatrix operator *(float multy, MyMatrix matrix1)
+        {
+            return matrix1 * multy;
+        }
+        static public MyMatrix operator /(float div, MyMatrix matrix1)
+        {
+            return matrix1 * (1/div);
+        }
+        static public MyMatrix operator /(MyMatrix matrix1, float div)
+        {
+            return matrix1 * (1 / div);
+        }
+        public float this[uint index1, uint index2]
+        {
+            get { return this.matrix[index1, index2]; }
+        }
+    }
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Program works!");
+            MyMatrix.rand1 = Convert.ToInt32(Console.ReadLine());
+            MyMatrix.rand2 = Convert.ToInt32(Console.ReadLine());
+            MyMatrix m1 = new MyMatrix(8, 4);
+            MyMatrix m2 = new MyMatrix(4, 8);
+            MyMatrix m3 = m1*0.1f;
+        }
+    }
+}
