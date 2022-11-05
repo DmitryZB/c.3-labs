@@ -1,0 +1,65 @@
+using System;
+
+namespace _2
+{
+
+    
+    class Program
+    {
+        class Vehicle
+        {
+            public uint price;
+            public uint speed;
+            public uint dev_year;
+            public Vehicle(uint p, uint s, uint dy) { }
+        }
+
+        class Plane : Vehicle
+        {
+            public uint f_height;
+            public uint p_amount;
+
+            public Plane(uint p, uint s, uint dy, uint f, uint pa):base(p,s,dy)
+            {
+                f_height = f;
+                p_amount = pa;
+            }
+            public void Print()
+            {
+                Console.WriteLine($"Price: {price}\nSpeed: {speed}\nDevelopment Year: {dev_year}\nFlying height: {f_height}\nPassangers amount: {p_amount}");
+            }
+        }
+        class Ship : Vehicle
+        {
+            public string port;
+            public uint p_amount;
+            public Ship(uint p, uint s, uint dy, string port_, uint pa) : base(p, s, dy)
+            {
+                port = port_;
+                p_amount = pa;
+            }
+            public void Print()
+            {
+                Console.WriteLine($"Price: {price}\nSpeed: {speed}\nDevelopment Year: {dev_year}\nPort: {port}\nPassangers amount: {p_amount}");
+            }
+        }
+        class Car : Vehicle
+        {
+            public Car(uint p, uint s, uint dy) : base(p, s, dy) { }
+            public void Print()
+            {
+                Console.WriteLine($"Price: {price}\nSpeed: {speed}\nDevelopment Year: {dev_year}");
+            }
+        }
+        static void Main(string[] args)
+        {
+            Car car = new Car(1200000, 200, 2018);
+            Plane plane = new Plane(50000000, 800, 2020, 6000, 350);
+            Ship ship = new Ship(12000000, 80, 2022, "Moscow central ship port", 500);
+            car.Print();
+            plane.Print();
+            ship.Print();
+
+        }
+    }
+}
