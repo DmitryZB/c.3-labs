@@ -1,0 +1,124 @@
+using System;
+
+namespace lab2
+{
+    class Program
+    {
+        class Pupil
+        {
+            public Pupil() { }
+            public virtual void Study() { }
+            public virtual void Read() { }
+            public virtual void Write() { }
+            public virtual void Relax() { }
+        }
+
+        class ExcelentPupil : Pupil
+        {
+            public ExcelentPupil() { }
+            public override void Study()
+            {
+                Console.WriteLine("Student excelent in studying");
+            }
+            public override void Read()
+            {
+                Console.WriteLine("Student excelent in reading");
+            }
+            public override void Write()
+            {
+                Console.WriteLine("Student excelent in writing");
+            }
+            public override void Relax()
+            {
+                Console.WriteLine("Student bad in relaxing");
+            }
+        }
+
+        class GoodPupil : Pupil
+        {
+            public GoodPupil() { }
+            public override void Study()
+            {
+                Console.WriteLine("Student good in studying");
+            }
+            public override void Read()
+            {
+                Console.WriteLine("Student good in reading");
+            }
+            public override void Write()
+            {
+                Console.WriteLine("Student good in writing");
+            }
+            public override void Relax()
+            {
+                Console.WriteLine("Student good in relaxing");
+            }
+        }
+
+        class BadPupil : Pupil
+        {
+            public BadPupil() { }
+            public override void Study()
+            {
+                Console.WriteLine("Student bad in studying");
+            }
+            public override void Read()
+            {
+                Console.WriteLine("Student bad in reading");
+            }
+            public override void Write()
+            {
+                Console.WriteLine("Student bad in writing");
+            }
+            public override void Relax()
+            {
+                Console.WriteLine("Student excelent in relaxing");
+            }
+        }
+
+        class ClassRoom
+        {
+            public Pupil p1;
+            public Pupil p2;
+            public Pupil p3;
+            public Pupil p4;
+
+            public ClassRoom(Pupil p1_, Pupil p2_, Pupil p3_, Pupil p4_)
+            {
+                p1 = p1_;
+                p2 = p2_;
+                p3 = p3_;
+                p4 = p4_;
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+            ExcelentPupil ep1 = new ExcelentPupil();
+            BadPupil bp2 = new BadPupil();
+            GoodPupil gp3 = new GoodPupil();
+            GoodPupil gp4 = new GoodPupil();
+
+            ClassRoom classroom1 = new ClassRoom(ep1, bp2, gp3, gp4);
+            classroom1.p1.Read();
+            classroom1.p1.Write();
+            classroom1.p1.Study();
+            classroom1.p1.Relax();
+
+            classroom1.p2.Read();
+            classroom1.p2.Write();
+            classroom1.p2.Study();
+            classroom1.p2.Relax();
+
+            classroom1.p3.Read();
+            classroom1.p3.Write();
+            classroom1.p3.Study();
+            classroom1.p3.Relax();
+
+            classroom1.p4.Read();
+            classroom1.p4.Write();
+            classroom1.p4.Study();
+            classroom1.p1.Relax();
+        }
+    }
+}
