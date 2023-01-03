@@ -1,0 +1,190 @@
+using System;
+
+
+namespace Classes
+{
+
+    //пользовательский атрибут
+    public class User_Attribute : Attribute
+    {
+        public string Comment { get; }
+        public User_Attribute(string comment_)
+        {
+            Comment = comment_;
+        }
+    }
+
+    //перечисление классов животных
+    public enum eClassificationAnimal
+    {
+        Herbivores,
+        Carnivores,
+        Omnivores
+    }
+
+    //перечисление питания
+    public enum eFavouriteFood
+    {
+        Meat,
+        Plants,
+        Everything
+    }
+
+    //абстрактный класс животное
+    [User_Attribute("Abstract animal")]
+    public abstract class Animal
+    {
+        public string Country { get; set; }
+        public bool? HideFromOtherAnimals { get; set; }
+        public string Name { get; set; }
+        public string WhatAnimal { get; set; }
+
+        public Animal()
+        {
+            Country = "";
+            HideFromOtherAnimals = null;
+            Name = "";
+            WhatAnimal = "";
+        }
+
+        public virtual void Deconstruct()
+        {
+            Country = "";
+            HideFromOtherAnimals = null;
+            Name = "";
+            WhatAnimal = "";
+        }
+
+        public virtual eClassificationAnimal? GetClassificationAnimal()
+        {
+            return null;
+        }
+
+        public virtual eFavouriteFood? GetFavouriteFood()
+        {
+            return null;
+        }
+
+        public virtual string SayHello()
+        {
+            return null;
+        }
+
+    }
+
+
+    //производный от класса животное класс корова
+    [User_Attribute("Cow")]
+    [Serializable]
+    class Cow : Animal
+    {
+        public Cow()
+        {
+            Country = "";
+            HideFromOtherAnimals = null;
+            Name = "";
+            WhatAnimal = "";
+        }
+
+        //пользовательский конструктор
+        public Cow(string country_, bool? is_hide_,
+            string name_, string animal_info_)
+        {
+            Country = country_;
+            HideFromOtherAnimals = is_hide_;
+            Name = name_;
+            WhatAnimal = animal_info_;
+        }
+
+        public override eClassificationAnimal? GetClassificationAnimal()
+        {
+            return eClassificationAnimal.Herbivores;        //травоядное
+        }
+
+        public override eFavouriteFood? GetFavouriteFood()
+        {
+            return eFavouriteFood.Plants;
+        }
+
+        public override string SayHello()
+        {
+            return "Moooow";
+        }
+    }
+
+
+    //производный от класса животное класс лев
+    [User_Attribute("Lion")]
+    class Lion : Animal
+    {
+        public Lion()
+        {
+            Country = "";
+            HideFromOtherAnimals = null;
+            Name = "";
+            WhatAnimal = "";
+        }
+
+        public Lion(string country_, bool? is_hide_,
+            string name_, string animal_info_)
+        {
+            Country = country_;
+            HideFromOtherAnimals = is_hide_;
+            Name = name_;
+            WhatAnimal = animal_info_;
+        }
+
+        public override eClassificationAnimal? GetClassificationAnimal()
+        {
+            return eClassificationAnimal.Carnivores;        //плотоядное
+        }
+
+        public override eFavouriteFood? GetFavouriteFood()
+        {
+            return eFavouriteFood.Meat;
+        }
+
+        public override string SayHello()
+        {
+            return "Rhaar";
+        }
+    }
+
+
+    //производный от класса животное класс свинья
+    [User_Attribute("Pig")]
+    class Pig : Animal
+    {
+        public Pig()
+        {
+            Country = "";
+            HideFromOtherAnimals = null;
+            Name = "";
+            WhatAnimal = "";
+        }
+
+        public Pig(string country_, bool? is_hide_,
+            string name_, string animal_info_)
+        {
+            Country = country_;
+            HideFromOtherAnimals = is_hide_;
+            Name = name_;
+            WhatAnimal = animal_info_;
+        }
+
+        public override eClassificationAnimal? GetClassificationAnimal()
+        {
+            return eClassificationAnimal.Omnivores;        //всеядное
+        }
+
+        public override eFavouriteFood? GetFavouriteFood()
+        {
+            return eFavouriteFood.Everything;
+        }
+
+        public override string SayHello()
+        {
+            return "Hruu";
+        }
+    }
+}
