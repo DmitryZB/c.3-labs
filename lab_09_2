@@ -1,0 +1,147 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace lab9_2
+{
+    class Program
+    {
+        static string API_KEY = "d4020b638cd47e7207bef9d86d8cb5f9";
+
+        public struct City
+        {
+
+            public string Name { get; set; }
+            public double Latitude { get; set; }
+            public double Longitude { get; set; }
+
+        }
+
+        public struct Weather
+        {
+            public string Country { get; set; }
+            public string Name { get; set; }
+            public double Temp { get; set; }
+            public string Description { get; set; }
+        }
+
+        public class API_call
+        {
+            public static async Task<Weather> GetWeather(City city)
+            {
+
+                var url = $"https://api.openweathermap.org/data/2.5/weather";
+                var parameters = $"?lat={city.Latitude}&lon={city.Longitude}&appid={API_KEY}";
+
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(url);
+
+                HttpResponseMessage response = new();
+
+                Console.WriteLine("Taking parse data...");
+                try
+                {
+                    response = await client.GetAsync(parameters);
+                }
+                catch (System.Net.Http.HttpRequestException)
+                {
+                    Console.WriteLine($"{city.Name} : Connection error");
+                }
+
+                Weather result = new();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string rawResponse = await response.Content.ReadAsStringAsync();
+
+                    Regex rx = new Regex("(?<=\"country\":\")[^\"]+(?=\")");
+                    result.Country = rx.Match(rawResponse).ToString();
+                    rx = new Regex("(?<=\"name\":\")[^\"]+(?=\")");
+                    result.Name = rx.Match(rawResponse).ToString();
+                    rx = new Regex("(?<=\"temp\":)[^\"]+(?=,)");
+                    result.Temp = Math.Round(Convert.ToDouble(rx.Match(rawResponse).ToString()) - 273);
+                    rx = new Regex("(?<=\"description\":\")[^\"]+(?=\")");
+                    result.Description = rx.Match(rawResponse).ToString();
+
+                }
+
+                Console.WriteLine($"{city.Name} : {result.Temp} degrees, {result.Description}");
+                return result;
+
+            }
+        }
+
+
+        public static City[] options = new City[0];
+        static bool resume = true;
+        public static void ConsoleRun()
+        {
+            string input = Console.ReadLine();
+
+            switch (input)
+            {
+                case ("quit"):
+                    {
+                        resume = false;
+                        break;
+                    }
+                case ("options"):
+                    {
+                        foreach (City entry in options)
+                        {
+                            Console.WriteLine($"> {entry.Name}");
+                        }
+                        break;
+                    }
+                default:
+                    {
+                        try
+                        {
+                            City newCity = options.Where(data => data.Name == input).First();
+                            _ = API_call.GetWeather(newCity);
+                        }
+                        catch
+                        {
+                            Console.WriteLine($"No \"{input}\" city found");
+                        }
+                        break;
+                    }
+            }
+            if (resume) ConsoleRun();
+
+        }
+
+        static void Main()
+        {
+
+            using (FileStream input = File.Open("/Users/dimon/Desktop/PROGRAMMING/C#/lab9/city.txt", FileMode.Open))
+            {
+                StreamReader reader = new(input);
+
+                string[] line;
+                City entry = new();
+
+                while (!reader.EndOfStream)
+                {
+                    line = reader.ReadLine().Replace("\t", " ").Split(" ");
+                    entry.Name = line[0];
+                    for (int i = 1; i < line.Length - 2; ++i) entry.Name += $" {line[i]}";
+                    entry.Latitude = Convert.ToDouble(line[line.Length - 2].Replace(",", ""));
+                    entry.Longitude = Convert.ToDouble(line[line.Length - 1]);
+                    options = options.Append(entry).ToArray();
+                }
+                reader.Close();
+            }
+
+            Console.WriteLine("Usage: \tEnter a city name to get weather information \n" +
+                                "\tEnter \"options\" to see the city list \n" +
+                                "\tEnter \"quit\" to quit \n" +
+                                "\tEnter some gibberish to do nothing \n");
+            ConsoleRun();
+
+        }
+    }
+}
