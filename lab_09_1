@@ -1,0 +1,103 @@
+using System;
+using System.IO;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Lab_09_1
+{
+    class Program
+    {
+
+        public class API_call
+        {
+            public static async Task<double?> GetAveragePrice(string stockName)
+            {
+                var url = $"https://query1.finance.yahoo.com/v7/finance/download/{stockName}";
+                var parameters = $"?period1={DateTimeOffset.Now.AddYears(-1).ToUnixTimeSeconds()}&period2={DateTimeOffset.Now.ToUnixTimeSeconds()}&interval=1d&events=history&includeAdjustedClose=true";
+
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(url);
+
+                HttpResponseMessage response = null;
+                while (response == null)
+                {
+                    try
+                    {
+                        response = await client.GetAsync(parameters);
+                    }
+                    catch (System.Net.Http.HttpRequestException)
+                    {
+                        Console.WriteLine($"{stockName} : connection error");
+                    }
+
+                }
+
+                string rawResponse = await response.Content.ReadAsStringAsync();
+
+                string[] data = rawResponse.Split('\n');
+                double sum = 0;
+                int count = 0;
+                foreach (string line in data)
+                {
+                    try
+                    {
+                        string[] dayData = line.Split(',');
+                        sum += (Convert.ToDouble(dayData[2]) + Convert.ToDouble(dayData[3])) / 2;
+                        count++;
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        Console.WriteLine($"{stockName} : missed data");
+                    }
+                    catch (FormatException) { }
+                }
+                if (count != 0) return sum / count;
+                else return null;
+
+            }
+        }
+
+        static Mutex mutOut = new();
+        static int ThreadCount = 0;
+        public static void GetAndWriteData(string name, StreamWriter outputWriter)
+        {
+            double? avgValue = API_call.GetAveragePrice(name).GetAwaiter().GetResult();
+            Console.WriteLine($"{name} : {avgValue}");
+            mutOut.WaitOne();
+            outputWriter.WriteLine($"{name} : {(avgValue == null ? "null" : avgValue)}");
+            outputWriter.Flush();
+            mutOut.ReleaseMutex();
+            ThreadCount--;
+        }
+
+        public static async Task<Task> GetAndWriteDataAsync(string name, StreamWriter outputWriter)
+        {
+            return Task.Run(() => GetAndWriteData(name, outputWriter));
+        }
+
+        static void Main()
+        {
+            using (FileStream input = File.Open("/Users/dimon/Desktop/PROGRAMMING/C#/lab9/ticker.txt", FileMode.Open),
+                output = File.Open("/Users/dimon/Desktop/PROGRAMMING/C#/lab9/avg.txt", FileMode.Create))
+            {
+                StreamReader inputReader = new StreamReader(input);
+                StreamWriter outputWriter = new StreamWriter(output);
+
+                while (!inputReader.EndOfStream)
+                {
+                    while (ThreadCount > 20) { }
+                    string name = inputReader.ReadLineAsync().GetAwaiter().GetResult();
+                    ThreadCount++;
+                    GetAndWriteDataAsync(name, outputWriter);
+                    Console.WriteLine($"Parsing {name}. . .");
+                    Thread.Sleep(1000);
+                }
+
+                while (ThreadCount > 0) { }
+                inputReader.Close();
+                outputWriter.Close();
+            }
+        }
+    }
+}
