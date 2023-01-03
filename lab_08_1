@@ -1,0 +1,26 @@
+using System.IO;
+using System.Xml.Serialization;
+using Classes;
+
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        XmlSerializer xmlSerializer_ = new XmlSerializer(typeof(Cow));
+        var animalToSerialize = new Cow("Ru", false, "burenka", "Good cow");
+        using (FileStream file_stream_ = new FileStream("animal.xml", FileMode.Truncate))
+        {
+            xmlSerializer_.Serialize(file_stream_, animalToSerialize);
+        }
+
+        using (FileStream file_stream_ = new FileStream("animal.xml", FileMode.OpenOrCreate))
+        {
+            var unserializeCow = xmlSerializer_.Deserialize(file_stream_) as Animal;
+            System.Console.WriteLine($"Country: {unserializeCow.Country}\n" +
+                $"Name: {unserializeCow.Name}\n" +
+                $"Is hide from animals: {unserializeCow.HideFromOtherAnimals}" +
+                $"Animal Info: {unserializeCow.WhatAnimal}");
+        }
+    }
+}
