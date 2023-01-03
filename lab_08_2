@@ -1,0 +1,38 @@
+using System;
+using System.IO;
+using System.IO.Compression;
+
+
+namespace lab08_2
+{
+    
+    class Program
+    {
+        public static readonly string PATH;
+
+        static Program()
+        {
+            PATH = Console.ReadLine();
+        }
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine(PATH);
+            var path_ = Directory.GetFiles(
+                "/Users/dimon/Desktop/PROGRAMMING/C#/lab07/lab07",
+                PATH, SearchOption.AllDirectories);
+            using (FileStream filestream_ = new FileStream(path_[0], FileMode.Open))
+            {
+                byte[] bytes = new byte[filestream_.Length];
+                UTF16Encoding data = new UTF16Encoding(true);
+                while(filestream_.Read(bytes, 0, bytes.Length) > 0)
+                {
+                    Console.WriteLine(data.GetString(bytes));
+                }
+                using FileStream aimstream = File.Create(PATH);
+                using GZipStream compression = new GZipStream(aimstream, CompressionMode.Compress);
+                filestream_.CopyTo(compression);
+            }
+        }
+    }
+}
