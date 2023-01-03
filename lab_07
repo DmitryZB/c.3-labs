@@ -1,0 +1,53 @@
+using System;
+using System.Reflection;
+using System.Text;
+using System.IO;
+using Classes;
+using System.Collections.Generic;
+using System.Linq;
+
+
+StringBuilder outputText = new(1000);
+
+void AddToOutput(string text)
+{
+    outputText.Append($"{Environment.NewLine}{text}");
+}
+
+Assembly theAssembly = Assembly.Load(new AssemblyName("classes"));
+
+AddToOutput($"Assembly: {theAssembly.FullName}");
+AddToOutput("Defined Types:");
+
+//foreach (Type definedType in theAssembly.ExportedTypes)
+Type definedType = typeof(Animal);
+{
+    if (definedType.GetTypeInfo().IsClass)
+    {
+        AddToOutput($"{Environment.NewLine}class {definedType.Name} : {definedType.BaseType}");
+
+        IEnumerable<User_Attribute> attributes = definedType.GetTypeInfo().GetCustomAttributes().OfType<User_Attribute>().ToArray();
+        if (attributes.Count() > 0)
+        {
+            foreach (User_Attribute attribute in attributes)
+            {
+                AddToOutput($"{Environment.NewLine}Comment: {attribute.Comment}");
+            }
+        }
+
+        AddToOutput("Methods:");
+        foreach (MethodInfo method in definedType.GetMethods())
+        {
+            string modificator = "";
+            if (method.IsStatic) modificator += "static ";
+            if (method.IsVirtual) modificator += "virtual ";
+
+            AddToOutput($"{modificator}{method.ReturnType.Name} {method.Name} ()");
+        }
+    }
+}
+
+System.Xml.Serialization.XmlSerializer writer = new System.Xml.Serialization.XmlSerializer(typeof(String));
+FileStream file = File.Create("AssemblyOverview.xml");
+writer.Serialize(file, outputText.ToString());
+file.Close();
